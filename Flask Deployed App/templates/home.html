@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlantDetect - AI Plant Health</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: #064e3b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 50px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            margin: none;
+            margin-right: 20px;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            align-items: left;
+            margin-left: 400px;
+        }
+
+        .navbar ul li {
+            margin: 0 15px;
+        }
+
+        .navbar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .navbar ul li a:hover {
+            color: #a3e635;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 60vh;
+            background: url('https://th.bing.com/th/id/R.598498ada51d3d380a4ab0d784455b2c?rik=PYMBSITAuO8aEA&riu=http%3a%2f%2fwallpapercave.com%2fwp%2fM6QLbQj.jpg&ehk=AkxvPVfHTk19R2rr9iRPKy8%2bst%2fSNvtEGamcexthx2E%3d&risl=&pid=ImgRaw&r=0') no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 40px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero button {
+            margin-top: 15px;
+            padding: 12px 20px;
+            font-size: 18px;
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .hero button:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        /* Main Content Layout */
+        .main-content {
+            display: flex;
+            padding: 40px;
+            gap: 30px;
+        }
+
+        /* Left Column - Plantation Cards */
+        .plantation-column {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .plantation-card {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .plantation-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .plantation-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .plantation-card a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .plantation-card .content {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .plantation-card .content h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #064e3b;
+        }
+
+        .plantation-card .content p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        /* Right Column - Map */
+        .map-column {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            height: fit-content;
+        }
+
+        .map-column:hover {
+            transform: translateY(-5px);
+        }
+
+        .map-column a {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            height: 100%;
+        }
+
+        .map-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .map-preview img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            display: block;
+        }
+
+        .map-content {
+            padding: 15px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .map-content h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #064e3b;
+        }
+
+        .map-content p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 0;
+        }
+
+        /* AI Engine Section */
+        .ai-engine {
+            text-align: center;
+            padding: 40px;
+            background: #dff2e1;
+        }
+
+        .ai-engine h3 {
+            margin-bottom: 20px;
+            color: #064e3b;
+        }
+
+        .ai-engine p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #444;
+            text-align: justify;
+            margin-bottom: 15px;
+            text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .translate-wrapper {
+            background: #065f46;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .translate-wrapper:hover {
+            background: #047857;
+        }
+
+        .translate-wrapper * {
+            color: black;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+
+        .goog-te-gadget {
+            font-family: Arial, sans-serif !important;
+            font-size: 14px !important;
+        }
+
+        .goog-te-gadget .goog-te-combo {
+            background: #ffffff;
+            color: #064e3b;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .goog-te-combo:hover {
+            background: black;
+        }
+
+        /* Footer */
+        .footer {
+            background: #064e3b;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .navbar {
+                padding: 15px 30px;
+            }
+
+            .navbar ul {
+                flex-wrap: wrap;
+                margin-left: 200px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .map-column {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .navbar ul {
+                flex-direction: column;
+                padding-top: 10px;
+                margin-left: 0;
+            }
+
+            .navbar ul li {
+                margin: 5px 0;
+            }
+
+            .hero {
+                height: 50vh;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .hero button {
+                font-size: 16px;
+                padding: 10px 16px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 24px;
+            }
+
+            .hero button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">🌿 Plant Disease Detection</div>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="index">AI Engine</a></li>
+            <li><a href="market">Supplements</a></li>
+            <li><a href="contact">Contact Us</a></li>
+        </ul>
+        <div class="translate-wrapper">
+            <div id="google_translate_element" class="translate-btn"></div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div>
+            <h1>Revolutionizing Plant Health with AI</h1>
+            <a href="index">
+                <button>Start Diagnosis</button>
+            </a>
+        </div>
+    </section>
+
+    <div class="main-content">
+        <div class="plantation-column">
+            <div class="plantation-card">
+                <a href="indoor">
+                    <img src="https://th.bing.com/th/id/OIP.gHxMcj6CxAOAczWLctVV6gHaE7?rs=1&pid=ImgDetMain"
+                        alt="Indoor Plants">
+                    <div class="content">
+                        <h3>Indoor Plantations</h3>
+                        <p>Discover how AI enhances indoor plant health with real-time monitoring.</p>
+                    </div>
+                </a>
+            </div>
+            <div class="plantation-card">
+                <a href="outdoor">
+                    <img src="https://i.pinimg.com/originals/48/65/75/48657589ef9e7b9ec42ca74a910576cc.jpg"
+                        alt="Outdoor Plants">
+                    <div class="content">
+                        <h3>Outdoor Plantations</h3>
+                        <p>AI-driven solutions for tackling plant diseases in outdoor environments.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="map-column">
+            <a href="map">
+                <div class="map-preview">
+                    <img src="https://th.bing.com/th/id/OIP.OgkM_5yY0DYEzozqjSxfGQHaI5?cb=iwc1&w=999&h=1200&rs=1&pid=ImgDetMain"
+                        alt="Ideal Crop Map">
+                    <div class="map-content">
+                        <h3>Ideal Crops Map</h3>
+                        <p>Interactive map showing plant disease distribution and treatment centers.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <section class="ai-engine">
+        <h3>How Our AI Engine Works</h3>
+        <br>
+        <p>Our AI-driven plant disease detection system leverages advanced deep learning models to analyze plant images
+            and detect potential diseases with high accuracy. The process follows these key steps:
+
+            Image Capture & Upload
+
+            Users capture or upload an image of their plant leaves showing signs of disease.
+
+            The system supports multiple image formats and optimizes the image for analysis.
+
+            AI-Powered Image Processing
+
+            The uploaded image is processed using computer vision techniques.
+
+            The model detects leaf patterns, color variations, and structural abnormalities.
+
+            Deep Learning Disease Classification
+
+            The AI model, trained on thousands of plant disease samples, classifies the detected symptoms.
+
+            It predicts whether the plant is healthy or suffering from diseases like fungal infections, bacterial spots,
+            or nutrient deficiencies.
+
+            Real-Time Diagnosis & Recommendations
+
+            The system provides an instant diagnosis with a confidence score.
+
+            Users receive personalized recommendations, including treatment options and preventive measures.
+
+            Continuous Learning & Improvement
+
+            The AI continuously improves by learning from new user-uploaded images.
+
+            Regular updates enhance detection accuracy and expand the model's knowledge base.
+            <br>
+            <br>
+
+            🌿 Empowering Farmers & Gardeners: Our AI solution helps farmers and researchers maintain
+            healthier plants, reduce crop losses, and adopt sustainable plant care practices..
+        </p>
+    </section>
+    <footer class="footer">
+        &copy; 2025 PlantDetect. All rights reserved.
+    </footer>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement(
+                {
+                    pageLanguage: 'en',
+                    includedLanguages: 'hi',
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                },
+                'google_translate_element'
+            );
+        }
+    </script>
+
+    <script type="text/javascript"
+        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+
+</html>

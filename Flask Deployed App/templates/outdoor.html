@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outdoor Crop Plantation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      overflow: hidden;
+      padding-top: 80px;
+      /* Ensures content is not hidden under fixed navbar */
+    }
+
+    header {
+      background: #2ecc71;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    .crop-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .crop {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: calc(33.333% - 20px);
+      min-width: 250px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .crop:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+
+    .crop img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 5px;
+      transition: transform 0.3s ease;
+    }
+
+    .crop:hover img {
+      transform: scale(0.98);
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background: #2ecc71;
+      color: white;
+      margin-top: 20px;
+    }
+
+    .navbar {
+      background: #064e3b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 50px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
+      margin: none;
+      margin-right: 20px;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      align-items: left;
+      margin-left: 400px;
+    }
+
+    .navbar ul li {
+      margin: 0 15px;
+    }
+
+    .navbar ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      transition: color 0.3s;
+
+    }
+
+    .navbar ul li a:hover {
+      color: #a3e635;
+    }
+
+    .translate-wrapper {
+      background: #065f46;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.3s ease;
+    }
+
+    .translate-wrapper:hover {
+      background: #047857;
+    }
+
+    .translate-wrapper * {
+      color: black;
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+    }
+
+    .goog-te-gadget {
+      font-family: Arial, sans-serif !important;
+      font-size: 14px !important;
+    }
+
+    .goog-te-gadget .goog-te-combo {
+      background: #ffffff;
+      color: #064e3b;
+      border: none;
+      /* padding: 4px 8px; */
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .goog-te-combo:hover {
+      background: black;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .crop {
+        width: calc(50% - 20px);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .navbar ul {
+        flex-direction: column;
+        display: none;
+        width: 100%;
+        text-align: center;
+        margin-right: 25px;
+      }
+
+      .navbar ul.show {
+        display: flex;
+      }
+
+      .navbar ul li {
+        margin: 10px 0;
+      }
+
+      .crop {
+        width: calc(100% - 20px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="logo">🌿 Plant Disease Detection</div>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="index">AI Engine</a></li>
+      <li><a href="market">Supplements</a></li>
+      <li><a href="contact">Contact Us</a></li>
+    </ul>
+    <div class="translate-wrapper">
+      <div id="google_translate_element" class="translate-btn"></div>
+    </div>
+
+  </nav>
+  <div class="container">
+    <div class="crop-list">
+      <div class="crop">
+        <img src="https://omiaagribusinessdg.com/wp-content/uploads/2023/01/2.webp" alt="Carrots" />
+        <h3>Carrots</h3>
+        <p>
+          Carrots grow best in deep, loose, sandy loam soil that's free of rocks to allow straight root development.
+          They require full sun for 6–8 hours daily and grow best in cooler weather (ideal: 15–21°C or 59–70°F).
+          Sow seeds directly in containers at least 12 inches deep.
+          Keep soil evenly moist throughout the growing cycle. Most carrot varieties mature in 60–75 days.
+          Thin seedlings to avoid overcrowding and harvest when the tops start to show above the soil.
+        </p>
+      </div>
+      <div class="crop">
+        <img src="https://www.asiafarming.com/wp-content/uploads/2016/12/Health-Benefits-of-Green-Peas..jpg"
+          alt="Green Beas" />
+        <h3>Green Peas</h3>
+        <p>
+          Green peas are cool-season crops that grow well in containers with support like trellises or stakes.
+          Plant in rich, well-drained soil with compost. They need 6 hours of full sun daily.
+          Sow seeds directly and water regularly, especially during flowering.
+          Peas mature in 50–70 days, and regular harvesting encourages more pods.
+          Dwarf varieties like 'Little Marvel' are ideal for indoor growing.
+        </p>
+      </div>
+      <div class="crop">
+        <img
+          src="https://d3kgrlupo77sg7.cloudfront.net/media/l3-grocery3.shopnix.org/images/products/medium/rtrd001.20180827095448.webp"
+          alt="Raddish" />
+        <h3>Raddish</h3>
+        <p>
+          Radishes are among the fastest-growing root vegetables, maturing in just 25–35 days.
+          They prefer cool temperatures and loose, well-aerated soil.
+          Use containers at least 8 inches deep and place them where they get 4–6 hours of sunlight.
+          Water evenly to avoid the roots becoming woody. Sow every two weeks for continuous harvests.
+          Excellent choice for beginner gardeners with limited space.
+        </p>
+      </div>
+      <div class="crop">
+        <img src="https://plantix.net/en/library/assets/custom/crop-images/sugarcane.jpeg" alt="Sugarcane" />
+        <h3>Sugarcane</h3>
+        <p>
+          Sugarcane is a tall, tropical grass that requires a lot of warmth, sunlight, and water.
+          It's typically grown from stem cuttings ("setts") planted in moist, loamy soil with good drainage.
+          While not ideal for small containers, it can be grown in large pots or buckets at least 16 inches deep.
+          Needs 8+ hours of sunlight daily and consistent watering.
+          Takes 9–12 months to mature, and regular weeding is essential for healthy growth.
+          Suited more for educational or experimental indoor gardens.
+        </p>
+      </div>
+      <!-- New crops added below -->
+      <div class="crop">
+        <img src="https://5.imimg.com/data5/ST/QW/MY-38700875/fresh-wheat-crop-1000x1000.jpg" alt="Wheat" />
+        <h3>Wheat</h3>
+        <p>
+          Wheat is a cool-season cereal grain that can be grown indoors for educational or microgreen purposes.
+          Use a wide, shallow container filled with fertile, well-drained soil.
+          It requires at least 6 hours of direct light or strong grow lights and regular watering.
+          While full grain production indoors is uncommon, wheatgrass can be harvested within 7–10 days for juicing.
+          For full wheat heads, expect a growth cycle of 90–120 days.
+        </p>
+      </div>
+      <div class="crop">
+        <img
+          src="https://b1761949.smushcdn.com/1761949/wp-content/uploads/2020/04/arroz-872x760.jpg?lossy=0&strip=1&webp=1"
+          alt="Peppers" />
+        <h3>Rice</h3>
+        <p>
+          Rice is a water-intensive tropical crop best suited for larger indoor setups or hydroponics.
+          It requires a warm climate (21–35°C or 70–95°F) and consistent moisture.
+          Use wide, waterproof containers with 6–8 inches of fertile clay soil, and flood the container with 2–4 inches
+          of water.
+          Provide 8+ hours of sunlight or grow light exposure daily.
+          Rice matures in about 100–150 days depending on the variety.
+          Ideal for educational or experimental purposes rather than practical home growing.
+        </p>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement(
+        {
+          pageLanguage: 'en',
+          includedLanguages: 'hi',
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        },
+        'google_translate_element'
+      );
+    }
+  </script>
+
+  <script type="text/javascript"
+    src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Crop Suggestion Map - North India</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #2e7d32;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .map-container {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #map {
+            height: 70vh;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .table-container {
+            padding: 20px;
+            background-color: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .table-header h3 {
+            color: #2e7d32;
+            font-size: 20px;
+        }
+
+        .selected-state {
+            font-weight: bold;
+            color: #ff6d00;
+        }
+
+        .state-crops-table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .state-crops-table th,
+        .state-crops-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .state-crops-table th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: 500;
+        }
+
+        .state-crops-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .state-crops-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Map Styling */
+        .leaflet-interactive {
+            transition: all 0.3s ease;
+        }
+
+        .leaflet-tooltip {
+            font-size: 14px;
+            font-weight: 600;
+            background-color: rgba(46, 125, 50, 0.9);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .leaflet-popup-content {
+            padding: 8px;
+            line-height: 1.6;
+        }
+
+        .popup-header {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2e7d32;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .crop-season {
+            font-weight: 600;
+            color: #ff6d00;
+            margin-top: 8px;
+        }
+
+        .crop-list {
+            margin: 4px 0;
+        }
+
+        .crop-conditions {
+            font-style: italic;
+            color: #555;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Interactive Crop Suggestion Map</h1>
+            <p>Explore agricultural recommendations for states across North India</p>
+        </header>
+
+        <div class="map-container">
+            <div style="position: relative;">
+                <div id="map"></div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #4CAF50;"></div>
+                        <span>Available States</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #FF9800;"></div>
+                        <span>Selected State</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Crop Details for <span id="selected-state-name">Select a state</span></h3>
+                </div>
+                <table class="state-crops-table">
+                    <thead>
+                        <tr>
+                            <th>Season</th>
+                            <th>Crops</th>
+                            <th>Growing Conditions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="crop-details">
+                        <tr>
+                            <td colspan="3">Please select a state on the map to view recommended crops.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        const map = L.map('map', {
+            zoomControl: false,
+            minZoom: 5,
+            maxZoom: 8
+        }).setView([27.5, 78.5], 5.5); // Centered better on North India
+        
+        // Add zoom control to a custom position
+        L.control.zoom({
+            position: 'topright'
+        }).addTo(map);
+
+        // Use CartoDB Positron for a cleaner map focused on boundaries
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 12
+        }).addTo(map);
+
+        // Create a bounds object for India (approximate)
+        const indiaBounds = L.latLngBounds(
+            L.latLng(5, 65),  // Southwest corner
+            L.latLng(36, 100)  // Northeast corner
+        );
+
+        // Set maximum bounds to prevent panning away from India
+        map.setMaxBounds(indiaBounds);
+        map.on('drag', function() {
+            map.panInsideBounds(indiaBounds, { animate: false });
+        });
+
+        // Define the states and their crop suggestions with more details
+        const states = [
+            {
+                name: "Haryana",
+                coordinates: [
+                    [30.0, 74.5], [30.0, 76.0], [29.5, 77.5], [28.5, 77.5],
+                    [28.0, 76.5], [28.5, 75.5], [29.5, 74.5], [30.0, 74.5]
+                ],
+                crops: [
+                    { season: 'Kharif (Jun–Oct)', crops: 'Paddy, Bajra, Cotton', conditions: 'Requires warm, humid conditions, ample water for paddy.' },
+                    { season: 'Rabi (Nov–Mar)', crops: 'Wheat, Mustard, Barley', conditions: 'Requires cool, dry conditions for wheat and barley.' },
+                    { season: 'Zaid (Apr–Jun)', crops: 'Moong, Watermelon, Cucumber', conditions: 'Moist conditions required for cucumber and watermelon.' }
+                ]
+            },
+            {
+                name: "Punjab",
+                coordinates: [
+                    [32.0, 74.0], [32.0, 75.5], [31.5, 76.0], [31.0, 76.0],
+                    [30.5, 75.0], [30.5, 74.0], [31.0, 73.5], [32.0, 74.0]
+                ],
+                crops: [
+                    { season: 'Kharif', crops: 'Rice, Maize, Cotton', conditions: 'Rice requires abundant water; maize thrives in warm conditions.' },
+                    { season: 'Rabi', crops: 'Wheat, Mustard, Barley', conditions: 'Requires cool weather for wheat, mustard grows in dry winters.' },
+                    { season: 'Zaid', crops: 'Melons, Cucumbers', conditions: 'Requires hot, dry climates for melons and cucumbers.' }
+                ]
+            },
+            {
+                name: "Madhya Pradesh",
+                coordinates: [
+                    [22.5, 76.0], [23.5, 77.5], [22.5, 78.5], [21.5, 78.0],
+                    [21.0, 77.0], [22.0, 75.0], [22.5, 76.0]
+                ],
+                crops: [
+                    { season: 'Kharif', crops: 'Soybean, Cotton, Maize', conditions: 'Requires warm conditions and sufficient water supply.' },
+                    { season: 'Rabi', crops: 'Wheat, Mustard, Gram', conditions: 'Wheat and mustard require cool and dry winters.' },
+                    { season: 'Zaid', crops: 'Watermelon, Cucumber', conditions: 'Hot, dry conditions suitable for watermelon.' }
+                ]
+            },
+            {
+                name: "Uttarakhand",
+                coordinates: [
+                    [30.5, 78.5], [31.0, 79.0], [30.0, 79.5], [29.5, 79.0],
+                    [29.5, 78.0], [30.0, 77.5], [30.5, 78.5]
+                ],
+                crops: [
+                    { season: 'Kharif', crops: 'Rice, Maize, Soybean', conditions: 'Rice requires abundant rainfall, maize grows in moderate climates.' },
+                    { season: 'Rabi', crops: 'Wheat, Mustard, Barley', conditions: 'Wheat thrives in cold and dry conditions.' },
+                    { season: 'Zaid', crops: 'Melons, Vegetables', conditions: 'Hot and dry conditions required for growing melons.' }
+                ]
+            },
+            {
+                name: "Bihar",
+                coordinates: [
+                    [25.5, 85.5], [26.0, 86.5], [25.0, 87.0], [24.5, 86.0],
+                    [24.0, 85.5], [25.0, 84.5], [25.5, 85.5]
+                ],
+                crops: [
+                    { season: 'Kharif', crops: 'Paddy, Maize, Sugarcane', conditions: 'Paddy requires plenty of water, maize grows in warm conditions.' },
+                    { season: 'Rabi', crops: 'Wheat, Mustard, Lentils', conditions: 'Cool, dry weather is suitable for wheat and mustard.' },
+                    { season: 'Zaid', crops: 'Vegetables, Cucumber', conditions: 'Cucumber and vegetables require hot, dry conditions.' }
+                ]
+            },
+            {
+                name: "Uttar Pradesh",
+                coordinates: [
+                    [29.0, 77.0], [29.0, 80.0], [27.0, 80.0], [27.0, 78.0],
+                    [28.0, 77.0], [29.0, 77.0]
+                ],
+                crops: [
+                    { season: 'Kharif', crops: 'Paddy, Sugarcane, Maize', conditions: 'Requires ample water for paddy and sugarcane.' },
+                    { season: 'Rabi', crops: 'Wheat, Barley, Chickpea', conditions: 'Requires dry, cool conditions for wheat and barley.' },
+                    { season: 'Zaid', crops: 'Muskmelon, Bitter Gourd', conditions: 'Requires hot, dry climates for melons and bitter gourd.' }
+                ]
+            }
+        ];
+
+        // Keep track of the current active state polygon
+        let activePolygon = null;
+
+        // Function to update the table dynamically based on the selected state
+        function updateCropTable(state) {
+            const cropDetailsContainer = document.getElementById('crop-details');
+            const selectedStateName = document.getElementById('selected-state-name');
+            
+            // Update the selected state name
+            selectedStateName.textContent = state.name;
+            selectedStateName.className = 'selected-state';
+            
+            // Clear previous content
+            cropDetailsContainer.innerHTML = '';
+
+            // Add new rows based on the selected state's crops
+            state.crops.forEach(crop => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${crop.season}</td>
+                    <td>${crop.crops}</td>
+                    <td>${crop.conditions}</td>
+                `;
+                cropDetailsContainer.appendChild(row);
+            });
+        }
+
+        // Loop through each state and add to the map
+        states.forEach(state => {
+            // Create a polygon for each state with no border
+            const polygon = L.polygon(state.coordinates, {
+                color: "#4CAF50",     
+                fillColor: "#4CAF50", 
+                fillOpacity: 0.7,    
+                weight: 0,            
+                interactive: true    
+            })
+                .bindPopup(function () {
+                    // Popup content with styled state name and crop details
+                    let popupContent = `<div class="popup-header">${state.name}</div>`;
+                    state.crops.forEach(crop => {
+                        popupContent += `
+                            <div class="crop-season">${crop.season}</div>
+                            <div class="crop-list">${crop.crops}</div>
+                            <div class="crop-conditions">${crop.conditions}</div>
+                        `;
+                    });
+                    return popupContent;
+                })
+                .bindTooltip(`${state.name}`)
+                .on('mouseover', function (e) {
+                    // Highlight on hover without border
+                    if (activePolygon !== this) {
+                        e.target.setStyle({
+                            fillColor: '#81C784',
+                            fillOpacity: 0.8
+                        });
+                    }
+                    e.target.openTooltip();
+                })
+                .on('mouseout', function (e) {
+                    // Reset styles after hover only if not the active polygon
+                    if (activePolygon !== this) {
+                        e.target.setStyle({
+                            fillColor: '#4CAF50',
+                            fillOpacity: 0.7
+                        });
+                    }
+                    e.target.closeTooltip();
+                })
+                .on('click', function (e) {
+                    // Reset previous active polygon if exists
+                    if (activePolygon) {
+                        activePolygon.setStyle({
+                            fillColor: '#4CAF50',
+                            fillOpacity: 0.7
+                        });
+                    }
+                    
+                    activePolygon = this;
+                    
+                    e.target.setStyle({
+                        fillColor: '#FF9800',
+                        fillOpacity: 0.8
+                    });
+                    
+                    updateCropTable(state);
+                    e.target.openPopup();
+                })
+                .addTo(map);
+        });
+
+        const indiaOutline = [
+            [37, 68], [35, 76], [32, 79], [27, 97], [22, 94], [12, 92], [8, 77], [8, 72], [21, 68], [25, 61], [29, 60], [37, 68]
+        ];
+        
+        L.polyline(indiaOutline, {
+            color: '#e0e0e0',  
+            weight: 1,         
+            opacity: 0.5,      
+            fill: false
+        }).addTo(map);
+
+        const stateBounds = [];
+        states.forEach(state => {
+            state.coordinates.forEach(coord => {
+                stateBounds.push(L.latLng(coord[0], coord[1]));
+            });
+        });
+        map.fitBounds(L.latLngBounds(stateBounds));
+    </script>
+</body>
+
+</html>

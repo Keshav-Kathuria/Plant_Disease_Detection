@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outdoor Crop Plantation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      overflow: hidden;
+      padding-top: 80px;
+      /* Ensures content is not hidden under fixed navbar */
+    }
+
+    header {
+      background: #2ecc71;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    .crop-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .crop {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: calc(33.333% - 20px);
+      min-width: 250px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .crop:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+
+    .crop img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 5px;
+      transition: transform 0.3s ease;
+    }
+
+    .crop:hover img {
+      transform: scale(0.98);
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background: #2ecc71;
+      color: white;
+      margin-top: 20px;
+    }
+
+    .navbar {
+      background: #064e3b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 50px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
+      margin: none;
+      margin-right: 20px;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      align-items: left;
+      margin-left: 400px;
+    }
+
+    .navbar ul li {
+      margin: 0 15px;
+    }
+
+    .navbar ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      transition: color 0.3s;
+
+    }
+
+    .navbar ul li a:hover {
+      color: #a3e635;
+    }
+
+    .translate-wrapper {
+      background: #065f46;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.3s ease;
+    }
+
+    .translate-wrapper:hover {
+      background: #047857;
+    }
+
+    .translate-wrapper * {
+      color: black;
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+    }
+
+    .goog-te-gadget {
+      font-family: Arial, sans-serif !important;
+      font-size: 14px !important;
+    }
+
+    .goog-te-gadget .goog-te-combo {
+      background: #ffffff;
+      color: #064e3b;
+      border: none;
+      /* padding: 4px 8px; */
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .goog-te-combo:hover {
+      background: black;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .crop {
+        width: calc(50% - 20px);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .navbar ul {
+        flex-direction: column;
+        display: none;
+        width: 100%;
+        text-align: center;
+        margin-right: 25px;
+      }
+
+      .navbar ul.show {
+        display: flex;
+      }
+
+      .navbar ul li {
+        margin: 10px 0;
+      }
+
+      .crop {
+        width: calc(100% - 20px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="logo">🌿 Plant Disease Detection</div>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="index">AI Engine</a></li>
+      <li><a href="market">Supplements</a></li>
+      <li><a href="contact">Contact Us</a></li>
+    </ul>
+    <div class="translate-wrapper">
+      <div id="google_translate_element" class="translate-btn"></div>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="crop-list">
+      <div class="crop">
+        <img src="https://m.media-amazon.com/images/I/51QSUo5X2rL.jpg" alt="Lettuce" />
+        <h3>Lettuce</h3>
+        <p>
+          Lettuce is one of the easiest leafy greens to grow indoors. It matures quickly, often within 30–45 days.
+          Choose loose-leaf varieties like Romaine or Butterhead. Grow in shallow containers with rich, well-draining
+          soil.
+          Keep the soil consistently moist and provide 4–6 hours of indirect sunlight daily.
+          A north-facing window or an LED grow light setup works well. Harvest outer leaves regularly to promote
+          continued growth.
+        </p>
+      </div>
+      <div class="crop">
+        <img src="https://m.media-amazon.com/images/I/61MvtCqDMIL._SX300_SY300_QL70_FMwebp_.jpg" alt="Basil" />
+        <h3>Basil</h3>
+        <p> Basil is a fast-growing aromatic herb perfect for sunny kitchens. It loves warmth and needs at least 6–8
+          hours
+          of
+          direct sunlight or a strong grow light. Use a pot with drainage and nutrient-rich soil. Water deeply when the
+          top inch of soil is dry.
+          Start harvesting once the plant has 6–8 leaves. Prune regularly to avoid flowering, which can make the leaves
+          bitter.
+          Basil grows well alongside tomatoes or peppers.</p>
+      </div>
+      <div class="crop">
+        <img src="https://www.goinggreens.in/cdn/shop/files/CherryTomatoSeeds.jpg?v=1719832824&width=713"
+          alt="Tomatoes" />
+        <h3>Tomatoes</h3>
+        <p>
+          Indoor cherry tomatoes offer juicy rewards with proper care. They need 8–10 hours of intense light — a
+          south-facing window or grow light is essential.
+          Use deep containers (at least 12 inches) and well-draining potting mix with added compost.
+          Support the plant with stakes or cages, and maintain moderate humidity. Water evenly to prevent cracking.
+          Indoor tomato plants take 50–70 days to produce ripe fruits. Pollinate flowers manually with a soft brush if
+          grown indoors.
+        </p>
+      </div>
+      <div class="crop">
+        <img src="https://th.bing.com/th/id/OIP.vzRbz-n5HIf66ro_NmWsowHaE8?rs=1&pid=ImgDetMain" alt="Spinach" />
+        <h3>Spinach</h3>
+        <p>
+          Spinach is cold-tolerant and great for compact indoor gardens. It matures within 30–40 days and grows well in
+          containers 6–8 inches deep.
+          Use loamy soil and keep it moist but not soggy. Place the pot near a window that gets indirect sunlight or
+          under
+          LED lights.
+          Harvest leaves regularly starting from the outer edges. Avoid letting it bolt (flower), which leads to bitter
+          leaves.
+          Spinach is nutrient-dense, ideal for salads, soups, and smoothies. </p>
+      </div>
+      <!-- New crops added below -->
+      <div class="crop">
+        <img src="https://1.bp.blogspot.com/-twpj0AZMsWo/VLJFTATb9tI/AAAAAAAAKpo/PuPhR0NfeP8/s1600/eggplant.jpg"
+          alt="Eggplant" />
+        <h3>Eggplant</h3>
+        <p>
+          Dwarf eggplant varieties like ‘Patio Baby’ or ‘Little Finger’ are well-suited for container gardening indoors.
+          They require a warm, humid environment with at least 6 hours of sunlight or strong artificial lighting.
+          Use 10–12 inch deep pots and well-draining soil. Water when the top layer dries out and use organic fertilizer
+          every 2 weeks.
+          Flowering starts around 8–10 weeks; hand-pollination may be needed. Harvest when fruits are glossy and firm to
+          the touch.
+        </p>
+      </div>
+      <div class="crop">
+        <img
+          src="https://static1.backyardbossimages.com/wordpress/wp-content/uploads/2023/01/indoor-peppers.jpg?q=50&fit=crop&w=1100&h=618&dpr=1.5"
+          alt="Peppers" />
+        <h3>Peppers</h3>
+        <p>
+          Indoor peppers — whether bell, chili, or ornamental — need a warm environment with 8–10 hours of direct
+          sunlight.
+          Use a 10-inch or larger pot with drainage holes. Peppers prefer slightly acidic, loamy soil enriched with
+          compost.
+          Keep the temperature above 18°C (65°F) and water consistently when the topsoil dries.
+          Fertilize with a potassium-rich mix during flowering. Hand-pollinate flowers indoors for better fruit yield.
+          The fruits usually appear in 60–80 days, depending on the variety.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement(
+        {
+          pageLanguage: 'en',
+          includedLanguages: 'hi',
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        },
+        'google_translate_element'
+      );
+    }
+  </script>
+
+  <script type="text/javascript"
+    src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+
+</html>
