@@ -5,217 +5,510 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plant Disease Detection - Results</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            color: #333;
-            background: linear-gradient(to right, #d4fc79, #96e6a1);
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        .container {
-            max-width: 1100px;
+        /* Animated background particles */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
         }
 
-        .header-title {
-            font-weight: 700;
-            color: #064e3b;
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 30px;
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g"><stop offset="0%" stop-color="%2300ff88" stop-opacity="0.1"/><stop offset="100%" stop-color="%2300ff88" stop-opacity="0"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(%23g)"/></svg>') repeat;
+            background-size: 200px 200px;
+            animation: float 20s infinite linear;
+            opacity: 0.3;
         }
 
-        .shadow-box {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            text-align: justify;
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
         }
 
-        .shadow-box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-custom {
-            background: linear-gradient(to right, #064e3b, #0a6f4f);
-            color: white;
-            border-radius: 30px;
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: background 0.3s, transform 0.2s;
-        }
-
-        .btn-custom:hover {
-            background: linear-gradient(to right, #1bc292, #56ecbf);
-            transform: scale(1.05);
-        }
-
-        .result-section {
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f0f23;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .image-box img {
-            border-radius: 10px;
-            max-width: 400px;
-        }
-
-        .row-equal {
-            display: flex;
-            gap: 20px;
             justify-content: center;
-            margin-top: 20px;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
         }
 
-        .equal-box {
-            width: 48%;
-            min-height: 400px;
-            flex-direction: column;
-            text-align: center;
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #333;
+            border-top: 3px solid #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Navbar */
         .navbar {
-            background: #064e3b;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 15px 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(15, 15, 35, 0.98);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 50px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            /* position: fixed; */
-            top: 0;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #00ff88;
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00ff88, #00d4ff);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
             width: 100%;
         }
 
-        .navbar .logo {
-            font-size: 22px;
-            font-weight: bold;
-            color: white;
-            margin: none;
-            margin-right: 20px;
-        }
-
-        .navbar ul {
-            list-style: none;
-            display: flex;
-            align-items: left;
-            margin-left: 400px;
-        }
-
-        .navbar ul li {
-            margin: 0 15px;
-            margin-top: 20px;
-        }
-
-        .navbar ul li a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            transition: color 0.3s;
-        
-
-        }
-
-        .navbar ul li a:hover {
-            color: #a3e635;
-        }
-
         .translate-wrapper {
-            background: #065f46;
-            padding: 6px 12px;
-            border-radius: 6px;
-            transition: background 0.3s ease;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
         }
 
         .translate-wrapper:hover {
-            background: #047857;
+            background: rgba(0, 255, 136, 0.2);
+            transform: scale(1.05);
         }
 
-        .translate-wrapper * {
-            color: black;
-            font-size: 14px;
-            font-family: Arial, sans-serif;
+        /* Main content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 30px 50px;
         }
 
-        .goog-te-gadget {
-            font-family: Arial, sans-serif !important;
-            font-size: 14px !important;
+        .header-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(135deg, #00ff88, #00d4ff, #ff6b6b);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards, glow 2s ease-in-out 1s infinite alternate;
         }
 
-        .goog-te-gadget .goog-te-combo {
-            background: #ffffff;
-            color: #064e3b;
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.3)); }
+            to { filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.6)); }
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-section {
+            text-align: center;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease 0.3s forwards;
+        }
+
+        .disease-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #00ff88;
+        }
+
+        .image-result-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .image-box {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .image-box:hover {
+            transform: scale(1.05) rotateY(5deg);
+            box-shadow: 0 30px 60px rgba(0, 255, 136, 0.2);
+        }
+
+        .image-box img {
+            max-width: 400px;
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom {
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            color: #0f0f23;
             border: none;
-            /* padding: 4px 8px; */
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
+            border-radius: 50px;
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .goog-te-combo:hover {
-            background: black;
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn-custom:hover::before {
+            left: 0;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.4);
+            color: #0f0f23;
+        }
+
+        /* Glass cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .glass-card.animate {
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-content {
+            line-height: 1.8;
+            color: #e2e8f0;
+            text-align: justify;
+        }
+
+        .cards-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .supplement-card {
+            text-align: center;
+            padding: 40px 30px;
+        }
+
+        .supplement-card img {
+            max-width: 250px;
+            width: 100%;
+            border-radius: 15px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .supplement-card img:hover {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .supplement-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #00d4ff;
+            margin: 15px 0;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 20px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .header-title {
+                font-size: 2.5rem;
+            }
+            
+            .image-result-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .cards-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 100px 20px 30px;
+            }
+        }
+
+        /* Scroll animations */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .scroll-animate.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 
 <body>
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
 
-    <nav class="navbar">
-        <div class="logo">🌿 Plant Disease Detection</div>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="index">AI Engine</a></li>
-            <li><a href="market">Supplements</a></li>
-            <li><a href="contact">Contact Us</a></li>
-        </ul>
-        <div class="translate-wrapper">
-            <div id="google_translate_element" class="translate-btn"></div>
+    <!-- Animated background -->
+    <div class="bg-animation"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                🌿 Plant Disease Detection
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="index">AI Engine</a></li>
+                <li><a href="market">Supplements</a></li>
+                <li><a href="contact">Contact Us</a></li>
+            </ul>
+            <div class="translate-wrapper">
+                <div id="google_translate_element"></div>
+            </div>
         </div>
-
     </nav>
-    <div class="container py-5">
+
+    <!-- Main content -->
+    <div class="container">
         <h1 class="header-title">🍀 Disease Detection Results 🍀</h1>
+        
         <div class="result-section">
-            <h4><b>Disease Detected: {{ title }}</b></h4>
-            <div style="display: flex; align-items: center; gap: 20px;">
+            <h4 class="disease-title">Disease Detected: {{ title }}</h4>
+            <div class="image-result-container">
                 <div class="image-box">
-                    <img src="{{ image_url }}" class="img-fluid rounded">
+                    <img src="{{ image_url }}" alt="Detected plant disease" class="img-fluid">
                 </div>
-                <a href="index" class="btn btn-custom">Check Another Image</a>
+                <a href="index" class="btn-custom">
+                    🔍 Check Another Image
+                </a>
             </div>
         </div>
 
-        <div class="shadow-box mt-4" style="width: 100%;">
-            <h5><b>Description</b></h5>
-            <p>{{ desc }}</p>
+        <div class="glass-card scroll-animate">
+            <h5 class="card-title">📋 Description</h5>
+            <p class="card-content">{{ desc }}</p>
         </div>
 
-        <div class="row-equal">
-            <div class="shadow-box equal-box">
-                <h5><b>Prevention Methods</b></h5>
-                <p>{{ prevent }}</p>
+        <div class="cards-row">
+            <div class="glass-card scroll-animate">
+                <h5 class="card-title">🛡️ Prevention Methods</h5>
+                <p class="card-content">{{ prevent }}</p>
             </div>
 
             {% if pred != 4 %}
-            <div class="shadow-box equal-box">
-                <h5><b>Recommended Supplement</b></h5>
-                <img src="{{ simage }}" class="img-fluid rounded" width="250">
-                <h6 class="mt-2">{{ sname }}</h6>
-                <a target="_blank" href="{{ buy_link }}">
-                    <button class="btn btn-custom mt-3">Buy Product</button>
+            <div class="glass-card supplement-card scroll-animate">
+                <h5 class="card-title">💊 Recommended Supplement</h5>
+                <img src="{{ simage }}" alt="Recommended supplement" class="img-fluid">
+                <h6 class="supplement-name">{{ sname }}</h6>
+                <a href="{{ buy_link }}" target="_blank" class="btn-custom">
+                    🛒 Buy Product
                 </a>
             </div>
             {% endif %}
         </div>
     </div>
-    <script type="text/javascript">
+
+    <script>
+        // Loading animation
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    if (entry.target.classList.contains('glass-card')) {
+                        entry.target.classList.add('animate');
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all scroll-animate elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const animateElements = document.querySelectorAll('.scroll-animate');
+            animateElements.forEach(el => observer.observe(el));
+        });
+
+        // Google Translate
         function googleTranslateElementInit() {
             new google.translate.TranslateElement(
                 {
@@ -228,8 +521,7 @@
         }
     </script>
 
-    <script type="text/javascript"
-        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 
 </html>

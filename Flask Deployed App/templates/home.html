@@ -6,160 +6,394 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlantDetect - AI Plant Health</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+        }
+
+        :root {
+            --primary-green: #059669;
+            --dark-green: #047857;
+            --light-green: #10b981;
+            --accent-green: #34d399;
+            --bg-dark: #0f172a;
+            --text-light: #f1f5f9;
+            --text-gray: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
         body {
-            background-color: #f4f4f4;
-            color: #333;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* Navigation Bar */
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background: radial-gradient(circle at 20% 80%, var(--primary-green) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--accent-green) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, var(--light-green) 0%, transparent 50%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        /* Navbar */
         .navbar {
-            background: #064e3b;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(2, 6, 23, 0.95);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 50px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         .navbar .logo {
-            font-size: 22px;
-            font-weight: bold;
-            color: white;
-            margin: none;
-            margin-right: 20px;
-        }
-
-        .navbar ul {
-            list-style: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
             display: flex;
-            align-items: left;
-            margin-left: 400px;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .navbar ul li {
-            margin: 0 15px;
+        .logo-icon {
+            font-size: 2rem;
+            animation: pulse 2s infinite;
         }
 
-        .navbar ul li a {
-            color: white;
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
             text-decoration: none;
-            font-size: 18px;
-            transition: color 0.3s;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .navbar ul li a:hover {
-            color: #a3e635;
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #10b981, #059669, #047857);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-green);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .translate-wrapper {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .translate-wrapper:hover {
+            background: rgba(16, 185, 129, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Navbar */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
         }
 
         /* Hero Section */
         .hero {
             position: relative;
-            height: 60vh;
-            background: url('https://th.bing.com/th/id/R.598498ada51d3d380a4ab0d784455b2c?rik=PYMBSITAuO8aEA&riu=http%3a%2f%2fwallpapercave.com%2fwp%2fM6QLbQj.jpg&ehk=AkxvPVfHTk19R2rr9iRPKy8%2bst%2fSNvtEGamcexthx2E%3d&risl=&pid=ImgRaw&r=0') no-repeat center center/cover;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
-            color: white;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.5)),
+                url('https://tse3.mm.bing.net/th/id/OIP.pKsAENEwSSTrXGxFNCYaxgHaEK?r=0&w=1000&h=563&rs=1&pid=ImgDetMain&o=7&rm=3') center/cover;
+            z-index: -1;
+            animation: parallax 20s linear infinite;
+        }
+
+        @keyframes parallax {
+            0% {
+                transform: scale(1) translateY(0);
+            }
+
+            50% {
+                transform: scale(1.05) translateY(-10px);
+            }
+
+            100% {
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 2rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .hero h1 {
-            font-size: 40px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-green), var(--light-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+            animation: glow 3s ease-in-out infinite alternate;
         }
 
-        .hero button {
-            margin-top: 15px;
-            padding: 12px 20px;
-            font-size: 18px;
-            background: #28a745;
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.3));
+            }
+
+            to {
+                filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.6));
+            }
+        }
+
+        .hero-button {
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
             color: white;
             border: none;
+            border-radius: 50px;
             cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s, transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(5, 150, 105, 0.3);
         }
 
-        .hero button:hover {
-            background: #218838;
-            transform: scale(1.05);
+        .hero-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
         }
 
-        /* Main Content Layout */
+        .hero-button:hover::before {
+            left: 100%;
+        }
+
+        .hero-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(5, 150, 105, 0.4);
+        }
+
+        /* Main Content */
         .main-content {
-            display: flex;
-            padding: 40px;
-            gap: 30px;
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+            align-items: start;
         }
 
-        /* Left Column - Plantation Cards */
+        /* Plantation Cards */
         .plantation-column {
-            flex: 2;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 2rem;
         }
 
         .plantation-card {
-            width: 100%;
-            background: white;
-            border-radius: 10px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
+            transition: all 0.4s ease;
+            position: relative;
+            group: hover;
+        }
+
+        .plantation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(16, 185, 129, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .plantation-card:hover::before {
+            opacity: 1;
         }
 
         .plantation-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .plantation-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
         .plantation-card a {
             text-decoration: none;
             color: inherit;
+            display: block;
+            height: 100%;
+        }
+
+        .plantation-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .plantation-card:hover img {
+            transform: scale(1.1);
         }
 
         .plantation-card .content {
-            padding: 15px;
+            padding: 2rem;
             text-align: center;
+            position: relative;
+            z-index: 2;
         }
 
         .plantation-card .content h3 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            color: #064e3b;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-green);
         }
 
         .plantation-card .content p {
-            font-size: 16px;
-            color: #555;
+            color: var(--text-gray);
+            font-size: 1rem;
+            line-height: 1.6;
         }
 
-        /* Right Column - Map */
+        /* Map Column */
         .map-column {
-            flex: 1;
-            background: white;
-            border-radius: 10px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            height: fit-content;
+            transition: all 0.4s ease;
+            position: sticky;
+            top: 2rem;
         }
 
         .map-column:hover {
             transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
         }
 
         .map-column a {
@@ -169,283 +403,368 @@
             height: 100%;
         }
 
-        .map-preview {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
         .map-preview img {
             width: 100%;
-            height: auto;
+            height: 300px;
             object-fit: cover;
-            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .map-column:hover .map-preview img {
+            transform: scale(1.05);
         }
 
         .map-content {
-            padding: 15px;
+            padding: 2rem;
             text-align: center;
-            width: 100%;
         }
 
         .map-content h3 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            color: #064e3b;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-green);
         }
 
         .map-content p {
-            font-size: 16px;
-            color: #555;
-            margin-bottom: 0;
+            color: var(--text-gray);
+            font-size: 1rem;
+            line-height: 1.6;
         }
 
         /* AI Engine Section */
         .ai-engine {
+            background: linear-gradient(135deg, var(--glass-bg), rgba(52, 211, 153, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            margin: 4rem 2rem;
+            padding: 4rem;
+            border-radius: 30px;
             text-align: center;
-            padding: 40px;
-            background: #dff2e1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-engine::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .ai-engine h3 {
-            margin-bottom: 20px;
-            color: #064e3b;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--accent-green), var(--light-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .ai-engine p {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #444;
-            text-align: justify;
-            margin-bottom: 15px;
-            text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
-        }
-
-        .translate-wrapper {
-            background: #065f46;
-            padding: 6px 12px;
-            border-radius: 6px;
-            transition: background 0.3s ease;
-        }
-
-        .translate-wrapper:hover {
-            background: #047857;
-        }
-
-        .translate-wrapper * {
-            color: black;
-            font-size: 14px;
-            font-family: Arial, sans-serif;
-        }
-
-        .goog-te-gadget {
-            font-family: Arial, sans-serif !important;
-            font-size: 14px !important;
-        }
-
-        .goog-te-gadget .goog-te-combo {
-            background: #ffffff;
-            color: #064e3b;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .goog-te-combo:hover {
-            background: black;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-light);
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
         }
 
         /* Footer */
         .footer {
-            background: #064e3b;
-            color: white;
+            background: var(--bg-dark);
+            color: var(--text-light);
             text-align: center;
-            padding: 15px;
-            font-size: 16px;
-            margin-top: 20px;
+            padding: 2rem;
+            font-size: 1rem;
+            border-top: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
         }
 
         /* Responsive Design */
         @media (max-width: 1024px) {
             .navbar {
-                padding: 15px 30px;
-            }
-
-            .navbar ul {
-                flex-wrap: wrap;
-                margin-left: 200px;
-            }
-
-            .hero h1 {
-                font-size: 32px;
+                padding: 1rem 2rem;
             }
 
             .main-content {
-                flex-direction: column;
+                grid-template-columns: 1fr;
+                gap: 2rem;
             }
 
             .map-column {
-                width: 100%;
+                position: static;
             }
         }
 
         @media (max-width: 768px) {
             .navbar {
                 flex-direction: column;
-                align-items: center;
-                text-align: center;
+                gap: 1rem;
+                padding: 1rem;
             }
 
             .navbar ul {
-                flex-direction: column;
-                padding-top: 10px;
-                margin-left: 0;
-            }
-
-            .navbar ul li {
-                margin: 5px 0;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
             }
 
             .hero {
-                height: 50vh;
-            }
-
-            .hero h1 {
-                font-size: 28px;
-            }
-
-            .hero button {
-                font-size: 16px;
-                padding: 10px 16px;
+                height: 80vh;
             }
 
             .main-content {
-                padding: 20px;
+                padding: 2rem 1rem;
+            }
+
+            .ai-engine {
+                margin: 2rem 1rem;
+                padding: 2rem;
+            }
+
+            .ai-engine h3 {
+                font-size: 2rem;
             }
         }
 
         @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 24px;
+            .hero-content {
+                padding: 1rem;
             }
 
-            .hero button {
-                font-size: 14px;
-                padding: 8px 12px;
+            .plantation-card .content,
+            .map-content {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Scroll Animation */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .scroll-animate.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(52, 211, 153, 0.3);
+            border-top: 3px solid var(--accent-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
             }
         }
     </style>
 </head>
 
 <body>
-    <nav class="navbar">
-        <div class="logo">🌿 Plant Disease Detection</div>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="index">AI Engine</a></li>
-            <li><a href="market">Supplements</a></li>
-            <li><a href="contact">Contact Us</a></li>
-        </ul>
-        <div class="translate-wrapper">
-            <div id="google_translate_element" class="translate-btn"></div>
+    <div class="loading" id="loading">
+        <div class="loader"></div>
+    </div>
+
+    <div class="bg-animation"></div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">🌿 Plant Disease Detection </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="index">AI Engine</a></li>
+                <li><a href="market">Supplements</a></li>
+                <li><a href="contact">Contact Us</a></li>
+            </ul>
+            <div class="translate-wrapper">
+                <div id="google_translate_element"></div>
+            </div>
         </div>
     </nav>
 
+
+
     <section class="hero">
-        <div>
+        <div class="hero-bg"></div>
+        <div class="hero-content">
             <h1>Revolutionizing Plant Health with AI</h1>
-            <a href="index">
-                <button>Start Diagnosis</button>
-            </a>
+            <a href="index" class="hero-button">Start Diagnosis</a>
         </div>
     </section>
 
     <div class="main-content">
         <div class="plantation-column">
-            <div class="plantation-card">
+            <div class="plantation-card scroll-animate">
                 <a href="indoor">
                     <img src="https://th.bing.com/th/id/OIP.gHxMcj6CxAOAczWLctVV6gHaE7?rs=1&pid=ImgDetMain"
                         alt="Indoor Plants">
                     <div class="content">
                         <h3>Indoor Plantations</h3>
-                        <p>Discover how AI enhances indoor plant health with real-time monitoring.</p>
+                        <p>Click to explore the top indoor plants you can grow easily with ideal light, humidity, and
+                            care tips. </p>
                     </div>
                 </a>
             </div>
-            <div class="plantation-card">
+            <div class="plantation-card scroll-animate">
                 <a href="outdoor">
                     <img src="https://i.pinimg.com/originals/48/65/75/48657589ef9e7b9ec42ca74a910576cc.jpg"
                         alt="Outdoor Plants">
                     <div class="content">
                         <h3>Outdoor Plantations</h3>
-                        <p>AI-driven solutions for tackling plant diseases in outdoor environments.</p>
+                        <p>Tap to view which plants thrive outdoors plus the ideal conditions to keep them healthy!</p>
                     </div>
                 </a>
             </div>
         </div>
-        <div class="map-column">
+        <div class="map-column scroll-animate">
             <a href="map">
                 <div class="map-preview">
                     <img src="https://th.bing.com/th/id/OIP.OgkM_5yY0DYEzozqjSxfGQHaI5?cb=iwc1&w=999&h=1200&rs=1&pid=ImgDetMain"
                         alt="Ideal Crop Map">
                     <div class="map-content">
                         <h3>Ideal Crops Map</h3>
-                        <p>Interactive map showing plant disease distribution and treatment centers.</p>
+                        <p>Interactive map showing plant disease distribution for different states.</p>
                     </div>
                 </div>
             </a>
         </div>
     </div>
 
-    <section class="ai-engine">
+    <section class="ai-engine scroll-animate">
         <h3>How Our AI Engine Works</h3>
-        <br>
         <p>Our AI-driven plant disease detection system leverages advanced deep learning models to analyze plant images
             and detect potential diseases with high accuracy. The process follows these key steps:
 
-            Image Capture & Upload
-
+            <strong>Image Capture & Upload</strong><br>
             Users capture or upload an image of their plant leaves showing signs of disease.
-
             The system supports multiple image formats and optimizes the image for analysis.
 
-            AI-Powered Image Processing
-
+            <strong>AI-Powered Image Processing</strong><br>
             The uploaded image is processed using computer vision techniques.
-
             The model detects leaf patterns, color variations, and structural abnormalities.
 
-            Deep Learning Disease Classification
-
+            <strong>Deep Learning Disease Classification</strong><br>
             The AI model, trained on thousands of plant disease samples, classifies the detected symptoms.
-
             It predicts whether the plant is healthy or suffering from diseases like fungal infections, bacterial spots,
             or nutrient deficiencies.
 
-            Real-Time Diagnosis & Recommendations
-
+            <strong>Real-Time Diagnosis & Recommendations</strong><br>
             The system provides an instant diagnosis with a confidence score.
-
             Users receive personalized recommendations, including treatment options and preventive measures.
 
-            Continuous Learning & Improvement
-
+            <strong>Continuous Learning & Improvement</strong><br>
             The AI continuously improves by learning from new user-uploaded images.
-
             Regular updates enhance detection accuracy and expand the model's knowledge base.
-            <br>
-            <br>
 
-            🌿 Empowering Farmers & Gardeners: Our AI solution helps farmers and researchers maintain
-            healthier plants, reduce crop losses, and adopt sustainable plant care practices..
+            🌿 <strong>Empowering Farmers & Gardeners:</strong> Our AI solution helps farmers and researchers maintain
+            healthier plants, reduce crop losses, and adopt sustainable plant care practices.
         </p>
     </section>
+
     <footer class="footer">
         &copy; 2025 PlantDetect. All rights reserved.
     </footer>
 
     <script type="text/javascript">
+        // Loading animation
+        window.addEventListener('load', function () {
+            const loading = document.getElementById('loading');
+            setTimeout(() => {
+                loading.classList.add('hidden');
+            }, 1000);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function () {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-animate').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Google Translate
         function googleTranslateElementInit() {
             new google.translate.TranslateElement(
                 {

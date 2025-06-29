@@ -6,280 +6,673 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Outdoor Crop Plantation</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
       margin: 0;
       padding: 0;
-      background-color: #f4f4f4;
+      box-sizing: border-box;
     }
 
+    :root {
+      --primary-green: #059669;
+      --dark-green: #047857;
+      --light-green: #10b981;
+      --accent-green: #34d399;
+      --bg-dark: #0f172a;
+      --bg-secondary: #1e293b;
+      --text-light: #f1f5f9;
+      --text-gray: #64748b;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --card-bg: rgba(15, 23, 42, 0.8);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-secondary) 100%);
+      color: var(--text-light);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Animated Background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.1;
+      background: radial-gradient(circle at 20% 80%, var(--primary-green) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, var(--accent-green) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, var(--light-green) 0%, transparent 50%);
+      animation: float 8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-30px) rotate(180deg);
+      }
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .navbar.scrolled {
+      background: rgba(2, 6, 23, 0.95);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .navbar .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-icon {
+      font-size: 2rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(135deg, #10b981, #059669, #047857);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-green);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .translate-wrapper {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 8px;
+      padding: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .translate-wrapper:hover {
+      background: rgba(16, 185, 129, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Responsive Navbar */
+    @media (max-width: 768px) {
+      .nav-container {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+
+    /* Hero Header */
+    .hero-header {
+      text-align: center;
+      padding: 4rem 2rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, rgba(52, 211, 153, 0.1) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .hero-header h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent-green), var(--light-green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.3));
+      }
+
+      to {
+        filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.6));
+      }
+    }
+
+    .hero-header p {
+      font-size: 1.2rem;
+      color: var(--text-gray);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Container */
     .container {
       width: 90%;
-      max-width: 1200px;
-      margin: auto;
-      overflow: hidden;
-      padding-top: 80px;
-      /* Ensures content is not hidden under fixed navbar */
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 0;
     }
 
-    header {
-      background: #2ecc71;
-      color: white;
-      padding: 20px 0;
-      text-align: center;
-    }
-
+    /* Crop Grid */
     .crop-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      padding: 2rem 0;
     }
 
+    /* Crop Cards */
     .crop {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      width: calc(33.333% - 20px);
-      min-width: 250px;
-      text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .crop::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+
+    .crop:hover::before {
+      opacity: 1;
     }
 
     .crop:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
     .crop img {
       width: 100%;
-      height: 200px;
+      height: 250px;
       object-fit: cover;
-      border-radius: 5px;
-      transition: transform 0.3s ease;
+      transition: transform 0.4s ease;
     }
 
     .crop:hover img {
-      transform: scale(0.98);
+      transform: scale(1.1);
     }
 
-    footer {
+    .crop-content {
+      padding: 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .crop h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--accent-green);
       text-align: center;
-      padding: 10px;
-      background: #2ecc71;
-      color: white;
-      margin-top: 20px;
     }
 
-    .navbar {
-      background: #064e3b;
+    .crop p {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      text-align: justify;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-dark);
+      color: var(--text-light);
+      text-align: center;
+      padding: 2rem;
+      margin-top: 4rem;
+      border-top: 1px solid var(--glass-border);
+      position: relative;
+    }
+
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+    }
+
+    /* Loading Animation */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-dark);
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      padding: 15px 50px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      transition: opacity 0.5s ease;
     }
 
-    .navbar .logo {
-      font-size: 22px;
-      font-weight: bold;
-      color: white;
-      margin: none;
-      margin-right: 20px;
+    .loading.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
-    .navbar ul {
-      list-style: none;
-      display: flex;
-      align-items: left;
-      margin-left: 400px;
+    .loader {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(52, 211, 153, 0.3);
+      border-top: 3px solid var(--accent-green);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
-    .navbar ul li {
-      margin: 0 15px;
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
-    .navbar ul li a {
-      color: white;
-      text-decoration: none;
-      font-size: 18px;
-      transition: color 0.3s;
-
+    /* Scroll Animation */
+    .scroll-animate {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
     }
 
-    .navbar ul li a:hover {
-      color: #a3e635;
+    .scroll-animate.active {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .translate-wrapper {
-      background: #065f46;
-      padding: 6px 12px;
-      border-radius: 6px;
-      transition: background 0.3s ease;
+    /* Stagger animation for cards */
+    .crop:nth-child(1) {
+      animation-delay: 0.1s;
     }
 
-    .translate-wrapper:hover {
-      background: #047857;
+    .crop:nth-child(2) {
+      animation-delay: 0.2s;
     }
 
-    .translate-wrapper * {
-      color: black;
-      font-size: 14px;
-      font-family: Arial, sans-serif;
+    .crop:nth-child(3) {
+      animation-delay: 0.3s;
     }
 
-    .goog-te-gadget {
-      font-family: Arial, sans-serif !important;
-      font-size: 14px !important;
+    .crop:nth-child(4) {
+      animation-delay: 0.4s;
     }
 
-    .goog-te-gadget .goog-te-combo {
-      background: #ffffff;
-      color: #064e3b;
-      border: none;
-      /* padding: 4px 8px; */
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
+    .crop:nth-child(5) {
+      animation-delay: 0.5s;
     }
 
-    .goog-te-combo:hover {
-      background: black;
+    .crop:nth-child(6) {
+      animation-delay: 0.6s;
     }
 
     /* Responsive Design */
     @media (max-width: 1024px) {
-      .crop {
-        width: calc(50% - 20px);
+      .navbar {
+        padding: 1rem 2rem;
+      }
+
+      .crop-list {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
       }
     }
 
     @media (max-width: 768px) {
       .navbar {
         flex-direction: column;
-        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
       }
 
       .navbar ul {
-        flex-direction: column;
-        display: none;
-        width: 100%;
-        text-align: center;
-        margin-right: 25px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
       }
 
-      .navbar ul.show {
-        display: flex;
+      .hero-header {
+        padding: 2rem 1rem 1rem;
       }
 
-      .navbar ul li {
-        margin: 10px 0;
+      .container {
+        width: 95%;
+        padding: 1rem 0;
       }
 
-      .crop {
-        width: calc(100% - 20px);
+      .crop-list {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
       }
+
+      .crop-content {
+        padding: 1.5rem;
+      }
+
+      .crop p {
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-header h1 {
+        font-size: 2rem;
+      }
+
+      .hero-header p {
+        font-size: 1rem;
+      }
+
+      .crop h3 {
+        font-size: 1.25rem;
+      }
+
+      .crop p {
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-green);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-green);
     }
   </style>
 </head>
 
 <body>
-  <nav class="navbar">
-    <div class="logo">🌿 Plant Disease Detection</div>
-    <ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="index">AI Engine</a></li>
-      <li><a href="market">Supplements</a></li>
-      <li><a href="contact">Contact Us</a></li>
-    </ul>
-    <div class="translate-wrapper">
-      <div id="google_translate_element" class="translate-btn"></div>
-    </div>
+  <div class="loading" id="loading">
+    <div class="loader"></div>
+  </div>
 
+  <div class="bg-animation"></div>
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <div class="logo">🌿 Plant Disease Detection </div>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="index">AI Engine</a></li>
+        <li><a href="market">Supplements</a></li>
+        <li><a href="contact">Contact Us</a></li>
+      </ul>
+      <div class="translate-wrapper">
+        <div id="google_translate_element"></div>
+      </div>
+    </div>
   </nav>
+
+  <header class="hero-header">
+    <h1>Outdoor Crop Plantation</h1>
+    <p>Here’s a curated list of crops perfect for outdoor gardening. These selections are optimized for sunlight, temperature, and soil conditions.</p>
+  </header>
+
   <div class="container">
     <div class="crop-list">
-      <div class="crop">
+      <div class="crop scroll-animate">
         <img src="https://omiaagribusinessdg.com/wp-content/uploads/2023/01/2.webp" alt="Carrots" />
-        <h3>Carrots</h3>
-        <p>
-          Carrots grow best in deep, loose, sandy loam soil that's free of rocks to allow straight root development.
-          They require full sun for 6–8 hours daily and grow best in cooler weather (ideal: 15–21°C or 59–70°F).
-          Sow seeds directly in containers at least 12 inches deep.
-          Keep soil evenly moist throughout the growing cycle. Most carrot varieties mature in 60–75 days.
-          Thin seedlings to avoid overcrowding and harvest when the tops start to show above the soil.
-        </p>
+        <div class="crop-content">
+          <h3>Carrots</h3>
+          <p>
+            Carrots grow best in deep, loose, sandy loam soil that's free of rocks to allow straight root development.
+            They require full sun for 6–8 hours daily and grow best in cooler weather (ideal: 15–21°C or 59–70°F).
+            Sow seeds directly in containers at least 12 inches deep.
+            Keep soil evenly moist throughout the growing cycle. Most carrot varieties mature in 60–75 days.
+            Thin seedlings to avoid overcrowding and harvest when the tops start to show above the soil.
+
+          </p>
+        </div>
       </div>
-      <div class="crop">
+
+      <div class="crop scroll-animate">
         <img src="https://www.asiafarming.com/wp-content/uploads/2016/12/Health-Benefits-of-Green-Peas..jpg"
-          alt="Green Beas" />
-        <h3>Green Peas</h3>
-        <p>
-          Green peas are cool-season crops that grow well in containers with support like trellises or stakes.
-          Plant in rich, well-drained soil with compost. They need 6 hours of full sun daily.
-          Sow seeds directly and water regularly, especially during flowering.
-          Peas mature in 50–70 days, and regular harvesting encourages more pods.
-          Dwarf varieties like 'Little Marvel' are ideal for indoor growing.
-        </p>
+          alt="Green Peas" />
+        <div class="crop-content">
+          <h3>Green Peas</h3>
+          <p>
+            Green peas are cool-season crops that grow well in containers with support like trellises or stakes.
+            Plant in rich, well-drained soil with compost. They need 6 hours of full sun daily.
+            Sow seeds directly and water regularly, especially during flowering.
+            Peas mature in 50–70 days, and regular harvesting encourages more pods.
+            Dwarf varieties like 'Little Marvel' are ideal for indoor growing.
+          </p>
+        </div>
       </div>
-      <div class="crop">
+
+      <div class="crop scroll-animate">
         <img
           src="https://d3kgrlupo77sg7.cloudfront.net/media/l3-grocery3.shopnix.org/images/products/medium/rtrd001.20180827095448.webp"
           alt="Raddish" />
-        <h3>Raddish</h3>
-        <p>
-          Radishes are among the fastest-growing root vegetables, maturing in just 25–35 days.
-          They prefer cool temperatures and loose, well-aerated soil.
-          Use containers at least 8 inches deep and place them where they get 4–6 hours of sunlight.
-          Water evenly to avoid the roots becoming woody. Sow every two weeks for continuous harvests.
-          Excellent choice for beginner gardeners with limited space.
-        </p>
+        <div class="crop-content">
+          <h3>Raddish</h3>
+          <p>
+            Radishes are among the fastest-growing root vegetables, maturing in just 25–35 days.
+            They prefer cool temperatures and loose, well-aerated soil.
+            Use containers at least 8 inches deep and place them where they get 4–6 hours of sunlight.
+            Water evenly to avoid the roots becoming woody. Sow every two weeks for continuous harvests.
+            Excellent choice for beginner gardeners with limited space.
+          </p>
+        </div>
       </div>
-      <div class="crop">
+
+      <div class="crop scroll-animate">
         <img src="https://plantix.net/en/library/assets/custom/crop-images/sugarcane.jpeg" alt="Sugarcane" />
-        <h3>Sugarcane</h3>
-        <p>
-          Sugarcane is a tall, tropical grass that requires a lot of warmth, sunlight, and water.
-          It's typically grown from stem cuttings ("setts") planted in moist, loamy soil with good drainage.
-          While not ideal for small containers, it can be grown in large pots or buckets at least 16 inches deep.
-          Needs 8+ hours of sunlight daily and consistent watering.
-          Takes 9–12 months to mature, and regular weeding is essential for healthy growth.
-          Suited more for educational or experimental indoor gardens.
-        </p>
+        <div class="crop-content">
+          <h3>Sugarcane</h3>
+          <p>
+            Sugarcane is a tall, tropical grass that requires a lot of warmth, sunlight, and water.
+            It's typically grown from stem cuttings ("setts") planted in moist, loamy soil with good drainage.
+            While not ideal for small containers, it can be grown in large pots or buckets at least 16 inches deep.
+            Needs 8+ hours of sunlight daily and consistent watering.
+            Takes 9–12 months to mature, and regular weeding is essential for healthy growth.
+            Suited more for educational or experimental indoor gardens.
+          </p>
+        </div>
       </div>
-      <!-- New crops added below -->
-      <div class="crop">
+
+      <div class="crop scroll-animate">
         <img src="https://5.imimg.com/data5/ST/QW/MY-38700875/fresh-wheat-crop-1000x1000.jpg" alt="Wheat" />
-        <h3>Wheat</h3>
-        <p>
-          Wheat is a cool-season cereal grain that can be grown indoors for educational or microgreen purposes.
-          Use a wide, shallow container filled with fertile, well-drained soil.
-          It requires at least 6 hours of direct light or strong grow lights and regular watering.
-          While full grain production indoors is uncommon, wheatgrass can be harvested within 7–10 days for juicing.
-          For full wheat heads, expect a growth cycle of 90–120 days.
-        </p>
+        <div class="crop-content">
+          <h3>Wheat</h3>
+          <p>
+            Wheat is a cool-season cereal grain that can be grown indoors for educational or microgreen purposes.
+            Use a wide, shallow container filled with fertile, well-drained soil.
+            It requires at least 6 hours of direct light or strong grow lights and regular watering.
+            While full grain production indoors is uncommon, wheatgrass can be harvested within 7–10 days for juicing.
+            For full wheat heads, expect a growth cycle of 90–120 days.
+          </p>
+        </div>
       </div>
-      <div class="crop">
+
+      <div class="crop scroll-animate">
         <img
           src="https://b1761949.smushcdn.com/1761949/wp-content/uploads/2020/04/arroz-872x760.jpg?lossy=0&strip=1&webp=1"
-          alt="Peppers" />
-        <h3>Rice</h3>
-        <p>
-          Rice is a water-intensive tropical crop best suited for larger indoor setups or hydroponics.
-          It requires a warm climate (21–35°C or 70–95°F) and consistent moisture.
-          Use wide, waterproof containers with 6–8 inches of fertile clay soil, and flood the container with 2–4 inches
-          of water.
-          Provide 8+ hours of sunlight or grow light exposure daily.
-          Rice matures in about 100–150 days depending on the variety.
-          Ideal for educational or experimental purposes rather than practical home growing.
-        </p>
+          alt="Rice" />
+        <div class="crop-content">
+          <h3>Rice</h3>
+          <p>
+            Rice is a water-intensive tropical crop best suited for larger indoor setups or hydroponics.
+            It requires a warm climate (21–35°C or 70–95°F) and consistent moisture.
+            Use wide, waterproof containers with 6–8 inches of fertile clay soil, and flood the container with 2–4
+            inches
+            of water.
+            Provide 8+ hours of sunlight or grow light exposure daily.
+            Rice matures in about 100–150 days depending on the variety.
+            Ideal for educational or experimental purposes rather than practical home growing.
+          </p>
+        </div>
       </div>
     </div>
   </div>
+
+  <footer class="footer">
+    &copy; 2025 PlantDetect. All rights reserved.
+  </footer>
+
   <script type="text/javascript">
+    // Loading animation
+    window.addEventListener('load', function () {
+      const loading = document.getElementById('loading');
+      setTimeout(() => {
+        loading.classList.add('hidden');
+      }, 1000);
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', function () {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Scroll animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.scroll-animate').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Google Translate
     function googleTranslateElementInit() {
       new google.translate.TranslateElement(
         {
@@ -290,6 +683,17 @@
         'google_translate_element'
       );
     }
+
+    // Add some interactive effects
+    document.querySelectorAll('.crop').forEach(card => {
+      card.addEventListener('mouseenter', function () {
+        this.style.transform = 'translateY(-10px) scale(1.02)';
+      });
+
+      card.addEventListener('mouseleave', function () {
+        this.style.transform = 'translateY(0) scale(1)';
+      });
+    });
   </script>
 
   <script type="text/javascript"

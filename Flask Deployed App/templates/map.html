@@ -4,228 +4,498 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Interactive Crop Suggestion Map - North India</title>
+    <title>Interactive Crop Suggestion Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: #f5f7fa;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g"><stop offset="0%" stop-color="%2300ff88" stop-opacity="0.1"/><stop offset="100%" stop-color="%2300ff88" stop-opacity="0"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(%23g)"/></svg>') repeat;
+            background-size: 200px 200px;
+            animation: float 20s infinite linear;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f0f23;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #333;
+            border-top: 3px solid #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px;
         }
 
+        /* Header */
         header {
-            background-color: #2e7d32;
-            color: white;
-            padding: 20px;
             text-align: center;
-            border-radius: 8px 8px 0 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards;
         }
 
-        header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+        .header-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #00ff88, #00d4ff, #ff6b6b);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
         }
 
-        header p {
-            font-size: 16px;
-            opacity: 0.9;
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #a0a9c8;
+            font-weight: 400;
         }
 
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.3)); }
+            to { filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.6)); }
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Main map container */
         .map-container {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            border-radius: 0 0 8px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
             overflow: hidden;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease 0.3s forwards;
+        }
+
+        .map-wrapper {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
         }
 
         #map {
-            height: 70vh;
+            height: 100%;
             width: 100%;
-            z-index: 1;
+            border-radius: 25px 25px 0 0;
         }
 
-        .table-container {
+        /* Custom legend */
+        .legend {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
             padding: 20px;
-            background-color: white;
-            border-top: 1px solid #e0e0e0;
+            color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .legend-title {
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #00ff88;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Table container */
+        .table-container {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0 0 25px 25px;
         }
 
         .table-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .table-header h3 {
-            color: #2e7d32;
-            font-size: 20px;
+        .table-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .selected-state {
-            font-weight: bold;
-            color: #ff6d00;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
         }
 
+        .state-info-card {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            padding: 15px 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .state-info-title {
+            font-size: 14px;
+            color: #a0a9c8;
+            margin-bottom: 5px;
+        }
+
+        .state-info-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00ff88;
+        }
+
+        /* Modern table */
         .state-crops-table {
             width: 100%;
-            border-collapse: collapse;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
             overflow: hidden;
-        }
-
-        .state-crops-table th,
-        .state-crops-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .state-crops-table th {
-            background-color: #4CAF50;
-            color: white;
-            font-weight: 500;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            color: #0f0f23;
+            padding: 20px 25px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+
+        .state-crops-table td {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .state-crops-table tr:last-child td {
             border-bottom: none;
         }
 
-        .state-crops-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        /* Map Styling */
-        .leaflet-interactive {
+        .state-crops-table tbody tr {
             transition: all 0.3s ease;
         }
 
-        .leaflet-tooltip {
-            font-size: 14px;
+        .state-crops-table tbody tr:hover {
+            background: rgba(0, 255, 136, 0.05);
+            transform: scale(1.01);
+        }
+
+        .season-cell {
             font-weight: 600;
-            background-color: rgba(46, 125, 50, 0.9);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 12px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            color: #00d4ff;
+            font-size: 16px;
         }
 
-        .leaflet-popup-content-wrapper {
-            border-radius: 8px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .leaflet-popup-content {
-            padding: 8px;
+        .crops-cell {
+            font-weight: 500;
+            color: #ffffff;
             line-height: 1.6;
         }
 
-        .popup-header {
-            font-weight: bold;
+        .conditions-cell {
+            color: #a0a9c8;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0a9c8;
             font-size: 16px;
-            color: #2e7d32;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Custom map controls */
+        .leaflet-control-zoom {
+            border: none !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .leaflet-control-zoom a {
+            background: rgba(15, 15, 35, 0.95) !important;
+            backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(0, 255, 136, 0.3) !important;
+            color: #00ff88 !important;
+            font-weight: 700 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .leaflet-control-zoom a:hover {
+            background: rgba(0, 255, 136, 0.2) !important;
+            color: #ffffff !important;
+            transform: scale(1.1) !important;
+        }
+
+        /* Custom popup styling */
+        .leaflet-popup-content-wrapper {
+            background: rgba(15, 15, 35, 0.95) !important;
+            backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(0, 255, 136, 0.3) !important;
+            border-radius: 15px !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .leaflet-popup-content {
+            color: #ffffff !important;
+            padding: 20px !important;
+            line-height: 1.6 !important;
+        }
+
+        .popup-header {
+            font-weight: 800 !important;
+            font-size: 18px !important;
+            color: #00ff88 !important;
+            border-bottom: 2px solid #00ff88 !important;
+            padding-bottom: 10px !important;
+            margin-bottom: 15px !important;
         }
 
         .crop-season {
-            font-weight: 600;
-            color: #ff6d00;
-            margin-top: 8px;
+            font-weight: 700 !important;
+            color: #00d4ff !important;
+            margin-top: 15px !important;
+            margin-bottom: 5px !important;
         }
 
         .crop-list {
-            margin: 4px 0;
+            color: #ffffff !important;
+            margin-bottom: 5px !important;
+            font-weight: 500 !important;
         }
 
         .crop-conditions {
-            font-style: italic;
-            color: #555;
-            font-size: 13px;
-            margin-bottom: 8px;
+            color: #a0a9c8 !important;
+            font-style: italic !important;
+            font-size: 13px !important;
+            margin-bottom: 10px !important;
         }
 
-        .legend {
-            position: absolute;
-            bottom: 30px;
-            right: 20px;
-            z-index: 1000;
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        /* Custom tooltip */
+        .leaflet-tooltip {
+            background: rgba(0, 255, 136, 0.95) !important;
+            border: none !important;
+            border-radius: 8px !important;
+            color: #0f0f23 !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            padding: 8px 12px !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
         }
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header-title {
+                font-size: 2.5rem;
+            }
+            
+            .map-wrapper {
+                height: 60vh;
+                min-height: 400px;
+            }
+            
+            .legend {
+                top: 10px;
+                right: 10px;
+                padding: 15px;
+            }
+            
+            .table-container {
+                padding: 20px;
+            }
+            
+            .state-crops-table th,
+            .state-crops-table td {
+                padding: 15px;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
 
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
-            border-radius: 3px;
+        /* Loading state for table */
+        .table-loading {
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .table-loaded {
+            opacity: 1;
         }
     </style>
 </head>
 
 <body>
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Animated background -->
+    <div class="bg-animation"></div>
+
     <div class="container">
         <header>
-            <h1>Interactive Crop Suggestion Map</h1>
-            <p>Explore agricultural recommendations for states across North India</p>
+            <h1 class="header-title">🌾 Interactive Crop Suggestion Map</h1>
+            <p class="header-subtitle">Explore agricultural recommendations for states across India</p>
         </header>
 
         <div class="map-container">
-            <div style="position: relative;">
+            <div class="map-wrapper">
                 <div id="map"></div>
                 
                 <div class="legend">
+                    <div class="legend-title">🗺️ Map Legend</div>
                     <div class="legend-item">
-                        <div class="legend-color" style="background-color: #4CAF50;"></div>
+                        <div class="legend-color" style="background: linear-gradient(135deg, #00ff88, #00d4ff);"></div>
                         <span>Available States</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-color" style="background-color: #FF9800;"></div>
+                        <div class="legend-color" style="background: linear-gradient(135deg, #ff6b6b, #ffa726);"></div>
                         <span>Selected State</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: linear-gradient(135deg, #4fc3f7, #29b6f6);"></div>
+                        <span>Hover State</span>
                     </div>
                 </div>
             </div>
 
             <div class="table-container">
                 <div class="table-header">
-                    <h3>Crop Details for <span id="selected-state-name">Select a state</span></h3>
+                    <h3 class="table-title">
+                        🌱 Crop Details for <span id="selected-state-name">Select a state</span>
+                    </h3>
+                    <div class="state-info-card" id="stateInfoCard" style="display: none;">
+                        <div class="state-info-title">Selected Region</div>
+                        <div class="state-info-name" id="stateInfoName">-</div>
+                    </div>
                 </div>
-                <table class="state-crops-table">
+                <table class="state-crops-table" id="cropsTable">
                     <thead>
                         <tr>
-                            <th>Season</th>
-                            <th>Crops</th>
-                            <th>Growing Conditions</th>
+                            <th>🌾 Season</th>
+                            <th>🌿 Recommended Crops</th>
+                            <th>🌡️ Growing Conditions</th>
                         </tr>
                     </thead>
                     <tbody id="crop-details">
                         <tr>
-                            <td colspan="3">Please select a state on the map to view recommended crops.</td>
+                            <td colspan="3" class="empty-state">
+                                <div class="empty-state-icon">🗺️</div>
+                                <div>Please select a state on the map to view recommended crops and growing conditions.</div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -235,38 +505,48 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        // Initialize the map
+        // Loading animation
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // Initialize the map with custom dark style
         const map = L.map('map', {
             zoomControl: false,
             minZoom: 5,
-            maxZoom: 8
-        }).setView([27.5, 78.5], 5.5); // Centered better on North India
+            maxZoom: 8,
+            attributionControl: false
+        }).setView([27.5, 78.5], 5.5);
         
         // Add zoom control to a custom position
         L.control.zoom({
             position: 'topright'
         }).addTo(map);
 
-        // Use CartoDB Positron for a cleaner map focused on boundaries
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        // Use dark CartoDB tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd',
             maxZoom: 12
         }).addTo(map);
 
-        // Create a bounds object for India (approximate)
+        // Create bounds for India
         const indiaBounds = L.latLngBounds(
-            L.latLng(5, 65),  // Southwest corner
-            L.latLng(36, 100)  // Northeast corner
+            L.latLng(5, 65),
+            L.latLng(36, 100)
         );
 
-        // Set maximum bounds to prevent panning away from India
         map.setMaxBounds(indiaBounds);
         map.on('drag', function() {
             map.panInsideBounds(indiaBounds, { animate: false });
         });
 
-        // Define the states and their crop suggestions with more details
+        // States data with enhanced information
         const states = [
             {
                 name: "Haryana",
@@ -275,9 +555,9 @@
                     [28.0, 76.5], [28.5, 75.5], [29.5, 74.5], [30.0, 74.5]
                 ],
                 crops: [
-                    { season: 'Kharif (Jun–Oct)', crops: 'Paddy, Bajra, Cotton', conditions: 'Requires warm, humid conditions, ample water for paddy.' },
-                    { season: 'Rabi (Nov–Mar)', crops: 'Wheat, Mustard, Barley', conditions: 'Requires cool, dry conditions for wheat and barley.' },
-                    { season: 'Zaid (Apr–Jun)', crops: 'Moong, Watermelon, Cucumber', conditions: 'Moist conditions required for cucumber and watermelon.' }
+                    { season: 'Kharif (Jun–Oct)', crops: 'Paddy, Bajra, Cotton', conditions: 'Requires warm, humid conditions, ample water for paddy cultivation.' },
+                    { season: 'Rabi (Nov–Mar)', crops: 'Wheat, Mustard, Barley', conditions: 'Requires cool, dry conditions for optimal wheat and barley growth.' },
+                    { season: 'Zaid (Apr–Jun)', crops: 'Moong, Watermelon, Cucumber', conditions: 'Moist conditions required for cucumber and watermelon cultivation.' }
                 ]
             },
             {
@@ -287,9 +567,9 @@
                     [30.5, 75.0], [30.5, 74.0], [31.0, 73.5], [32.0, 74.0]
                 ],
                 crops: [
-                    { season: 'Kharif', crops: 'Rice, Maize, Cotton', conditions: 'Rice requires abundant water; maize thrives in warm conditions.' },
-                    { season: 'Rabi', crops: 'Wheat, Mustard, Barley', conditions: 'Requires cool weather for wheat, mustard grows in dry winters.' },
-                    { season: 'Zaid', crops: 'Melons, Cucumbers', conditions: 'Requires hot, dry climates for melons and cucumbers.' }
+                    { season: 'Kharif (Jun–Oct)', crops: 'Rice, Maize, Cotton', conditions: 'Rice requires abundant water; maize thrives in warm, humid conditions.' },
+                    { season: 'Rabi (Nov–Mar)', crops: 'Wheat, Mustard, Barley', conditions: 'Requires cool weather for wheat, mustard grows well in dry winters.' },
+                    { season: 'Zaid (Apr–Jun)', crops: 'Melons, Cucumbers', conditions: 'Requires hot, dry climates ideal for melon and cucumber growth.' }
                 ]
             },
             {
@@ -299,9 +579,9 @@
                     [21.0, 77.0], [22.0, 75.0], [22.5, 76.0]
                 ],
                 crops: [
-                    { season: 'Kharif', crops: 'Soybean, Cotton, Maize', conditions: 'Requires warm conditions and sufficient water supply.' },
-                    { season: 'Rabi', crops: 'Wheat, Mustard, Gram', conditions: 'Wheat and mustard require cool and dry winters.' },
-                    { season: 'Zaid', crops: 'Watermelon, Cucumber', conditions: 'Hot, dry conditions suitable for watermelon.' }
+                    { season: 'Kharif (Jun–Oct)', crops: 'Soybean, Cotton, Maize', conditions: 'Requires warm conditions and sufficient water supply for optimal growth.' },
+                    { season: 'Rabi (Nov–Mar)', crops: 'Wheat, Mustard, Gram', conditions: 'Wheat and mustard require cool and dry winter conditions.' },
+                    { season: 'Zaid (Apr–Jun)', crops: 'Watermelon, Cucumber', conditions: 'Hot, dry conditions are perfect for watermelon cultivation.' }
                 ]
             },
             {
@@ -311,9 +591,9 @@
                     [29.5, 78.0], [30.0, 77.5], [30.5, 78.5]
                 ],
                 crops: [
-                    { season: 'Kharif', crops: 'Rice, Maize, Soybean', conditions: 'Rice requires abundant rainfall, maize grows in moderate climates.' },
-                    { season: 'Rabi', crops: 'Wheat, Mustard, Barley', conditions: 'Wheat thrives in cold and dry conditions.' },
-                    { season: 'Zaid', crops: 'Melons, Vegetables', conditions: 'Hot and dry conditions required for growing melons.' }
+                    { season: 'Kharif (Jun–Oct)', crops: 'Rice, Maize, Soybean', conditions: 'Rice requires abundant rainfall, maize grows well in moderate mountain climates.' },
+                    { season: 'Rabi (Nov–Mar)', crops: 'Wheat, Mustard, Barley', conditions: 'Wheat thrives in cold and dry mountain conditions.' },
+                    { season: 'Zaid (Apr–Jun)', crops: 'Melons, Vegetables', conditions: 'Hot and dry valley conditions required for growing melons.' }
                 ]
             },
             {
@@ -323,9 +603,9 @@
                     [24.0, 85.5], [25.0, 84.5], [25.5, 85.5]
                 ],
                 crops: [
-                    { season: 'Kharif', crops: 'Paddy, Maize, Sugarcane', conditions: 'Paddy requires plenty of water, maize grows in warm conditions.' },
-                    { season: 'Rabi', crops: 'Wheat, Mustard, Lentils', conditions: 'Cool, dry weather is suitable for wheat and mustard.' },
-                    { season: 'Zaid', crops: 'Vegetables, Cucumber', conditions: 'Cucumber and vegetables require hot, dry conditions.' }
+                    { season: 'Kharif (Jun–Oct)', crops: 'Paddy, Maize, Sugarcane', conditions: 'Paddy requires plenty of water, maize grows well in warm, humid conditions.' },
+                    { season: 'Rabi (Nov–Mar)', crops: 'Wheat, Mustard, Lentils', conditions: 'Cool, dry weather is ideal for wheat and mustard cultivation.' },
+                    { season: 'Zaid (Apr–Jun)', crops: 'Vegetables, Cucumber', conditions: 'Cucumber and vegetables require hot, dry conditions with irrigation.' }
                 ]
             },
             {
@@ -335,52 +615,65 @@
                     [28.0, 77.0], [29.0, 77.0]
                 ],
                 crops: [
-                    { season: 'Kharif', crops: 'Paddy, Sugarcane, Maize', conditions: 'Requires ample water for paddy and sugarcane.' },
-                    { season: 'Rabi', crops: 'Wheat, Barley, Chickpea', conditions: 'Requires dry, cool conditions for wheat and barley.' },
-                    { season: 'Zaid', crops: 'Muskmelon, Bitter Gourd', conditions: 'Requires hot, dry climates for melons and bitter gourd.' }
+                    { season: 'Kharif (Jun–Oct)', crops: 'Paddy, Sugarcane, Maize', conditions: 'Requires ample water for paddy and sugarcane cultivation.' },
+                    { season: 'Rabi (Nov–Mar)', crops: 'Wheat, Barley, Chickpea', conditions: 'Requires dry, cool conditions for wheat and barley growth.' },
+                    { season: 'Zaid (Apr–Jun)', crops: 'Muskmelon, Bitter Gourd', conditions: 'Requires hot, dry climates for melons and bitter gourd cultivation.' }
                 ]
             }
         ];
 
-        // Keep track of the current active state polygon
         let activePolygon = null;
 
-        // Function to update the table dynamically based on the selected state
         function updateCropTable(state) {
             const cropDetailsContainer = document.getElementById('crop-details');
             const selectedStateName = document.getElementById('selected-state-name');
+            const stateInfoCard = document.getElementById('stateInfoCard');
+            const stateInfoName = document.getElementById('stateInfoName');
+            const table = document.getElementById('cropsTable');
             
-            // Update the selected state name
-            selectedStateName.textContent = state.name;
-            selectedStateName.className = 'selected-state';
+            // Add loading state
+            table.classList.add('table-loading');
             
-            // Clear previous content
-            cropDetailsContainer.innerHTML = '';
+            setTimeout(() => {
+                // Update the selected state name
+                selectedStateName.textContent = state.name;
+                selectedStateName.className = 'selected-state';
+                
+                // Show and update state info card
+                stateInfoCard.style.display = 'block';
+                stateInfoName.textContent = state.name;
+                
+                // Clear previous content
+                cropDetailsContainer.innerHTML = '';
 
-            // Add new rows based on the selected state's crops
-            state.crops.forEach(crop => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${crop.season}</td>
-                    <td>${crop.crops}</td>
-                    <td>${crop.conditions}</td>
-                `;
-                cropDetailsContainer.appendChild(row);
-            });
+                // Add new rows with enhanced styling
+                state.crops.forEach((crop, index) => {
+                    const row = document.createElement('tr');
+                    row.style.animationDelay = `${index * 0.1}s`;
+                    row.innerHTML = `
+                        <td class="season-cell">${crop.season}</td>
+                        <td class="crops-cell">${crop.crops}</td>
+                        <td class="conditions-cell">${crop.conditions}</td>
+                    `;
+                    cropDetailsContainer.appendChild(row);
+                });
+                
+                // Remove loading state
+                table.classList.remove('table-loading');
+                table.classList.add('table-loaded');
+            }, 300);
         }
 
-        // Loop through each state and add to the map
+        // Enhanced polygon styling and interactions
         states.forEach(state => {
-            // Create a polygon for each state with no border
             const polygon = L.polygon(state.coordinates, {
-                color: "#4CAF50",     
-                fillColor: "#4CAF50", 
-                fillOpacity: 0.7,    
-                weight: 0,            
-                interactive: true    
+                color: "transparent",
+                fillColor: "#00ff88",
+                fillOpacity: 0.6,
+                weight: 0,
+                interactive: true
             })
                 .bindPopup(function () {
-                    // Popup content with styled state name and crop details
                     let popupContent = `<div class="popup-header">${state.name}</div>`;
                     state.crops.forEach(crop => {
                         popupContent += `
@@ -393,38 +686,36 @@
                 })
                 .bindTooltip(`${state.name}`)
                 .on('mouseover', function (e) {
-                    // Highlight on hover without border
                     if (activePolygon !== this) {
                         e.target.setStyle({
-                            fillColor: '#81C784',
+                            fillColor: '#4fc3f7',
                             fillOpacity: 0.8
                         });
                     }
                     e.target.openTooltip();
                 })
                 .on('mouseout', function (e) {
-                    // Reset styles after hover only if not the active polygon
                     if (activePolygon !== this) {
                         e.target.setStyle({
-                            fillColor: '#4CAF50',
-                            fillOpacity: 0.7
+                            fillColor: '#00ff88',
+                            fillOpacity: 0.6
                         });
                     }
                     e.target.closeTooltip();
                 })
                 .on('click', function (e) {
-                    // Reset previous active polygon if exists
+                    // Reset previous active polygon
                     if (activePolygon) {
                         activePolygon.setStyle({
-                            fillColor: '#4CAF50',
-                            fillOpacity: 0.7
+                            fillColor: '#00ff88',
+                            fillOpacity: 0.6
                         });
                     }
                     
                     activePolygon = this;
                     
                     e.target.setStyle({
-                        fillColor: '#FF9800',
+                        fillColor: '#ff6b6b',
                         fillOpacity: 0.8
                     });
                     
@@ -434,17 +725,7 @@
                 .addTo(map);
         });
 
-        const indiaOutline = [
-            [37, 68], [35, 76], [32, 79], [27, 97], [22, 94], [12, 92], [8, 77], [8, 72], [21, 68], [25, 61], [29, 60], [37, 68]
-        ];
-        
-        L.polyline(indiaOutline, {
-            color: '#e0e0e0',  
-            weight: 1,         
-            opacity: 0.5,      
-            fill: false
-        }).addTo(map);
-
+        // Fit map to state bounds
         const stateBounds = [];
         states.forEach(state => {
             state.coordinates.forEach(coord => {
